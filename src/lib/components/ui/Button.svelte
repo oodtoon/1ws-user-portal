@@ -18,5 +18,5 @@
 <button
   on:click={handleClick}
   {value}
-  class="bg-accent-3 text-white rounded-md p-2 {className}"><slot /></button
+  class="bg-accent-3 text-white rounded-md p-2 {className} hover:bg-accent-2 hover:text-black"><slot /></button
 >

@@ -1,8 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
 
-  import Dialog from "./ui/Dialog.svelte";
-  import Button from "./ui/Button.svelte";
+  import Header from "../ui/Header.svelte";
+  import Dialog from "../ui/Dialog.svelte";
+  import Button from "../ui/Button.svelte";
 
   const dispatch = createEventDispatcher();
 
@@ -23,7 +24,7 @@
 </script>
 
 <Dialog class="">
-  <div class="">Enter in new address:</div>
+  <Header>Enter in new address:</Header>
   <form class="grid gap-2 grid-cols-3">
     <label for="address" class=""> Street Address: </label>
     <input

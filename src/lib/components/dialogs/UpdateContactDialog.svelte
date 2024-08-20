@@ -1,6 +1,7 @@
 <script lang="ts">
-  import Dialog from "./ui/Dialog.svelte";
-  import Button from "./ui/Button.svelte";
+  import Dialog from "../ui/Dialog.svelte";
+  import Button from "../ui/Button.svelte";
+  import Header from "../ui/Header.svelte";
   import { createEventDispatcher } from "svelte";
 
   export let field: string | undefined;
@@ -26,7 +27,7 @@
 </script>
 
 <Dialog class="items-center justify-items-center">
-  <div>Update {updateTitle}</div>
+  <Header>Update {updateTitle}</Header>
   <form class="grid grid-cols-3 gap-2 justify-items-center">
     <label for="name"> Name: </label>
     <input

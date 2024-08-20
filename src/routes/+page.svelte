@@ -4,19 +4,22 @@
   import TableHead from "$lib/components/ui/TableHead.svelte";
   import Button from "$lib/components/ui/Button.svelte";
   import InfoCard from "$lib/components/InfoCard.svelte";
-  import { currentSubscriptions } from "$lib/store";
-  import ContactAccountManager from "$lib/components/ContactAccountManager.svelte";
-  import UpdateContactDialog from "$lib/components/UpdateContactDialog.svelte";
-  import UpdateAddressDialog from "$lib/components/UpdateAddressDialog.svelte";
-  import CancelDialog from "$lib/components/CancelDialog.svelte";
+  import { currentSubscriptions, accountInfo } from "$lib/store";
+  import ContactAccountManager from "$lib/components/dialogs/ContactAccountManager.svelte";
+  import UpdateContactDialog from "$lib/components/dialogs/UpdateContactDialog.svelte";
+  import UpdateAddressDialog from "$lib/components/dialogs/UpdateAddressDialog.svelte";
+  import CancelDialog from "$lib/components/dialogs/CancelDialog.svelte";
+  import DenyCancelDialog from "$lib/components/dialogs/DenyCancelDialog.svelte";
   import Toast from "$lib/components/Toast.svelte";
   import type {
-    AccountInfoType,
     AddressType,
     ContactType,
     ContactFieldType,
-    ProductType,
+    SubscriptionInfoType,
   } from "$lib/types";
+  import { setContext } from "svelte";
+
+  setContext("subs", $currentSubscriptions);
 
   export let data;
   const { isToast, toastMessage } = data;
@@ -27,37 +30,18 @@
   let isUpdate = false;
   let isAddressUpdate = false;
   let isCancel = false;
-  let serviceToCancel: ProductType | undefined;
+  let isDenyCancel = false;
+  let serviceToCancel: SubscriptionInfoType | undefined;
+
+  const today = new Date();
+  const futureDate = new Date("9/1/2024");
+  const compareDate = new Date("9/1/2024");
+
+  console.log(compareDate.setDate(futureDate.getDate() - 30));
+  console.log(today < compareDate);
+  console.log(compareDate);
 
   let toastInt;
-
-  let accountInfo: AccountInfoType = {
-    name: "Honey Bee Hons",
-    id: "1229132",
-    billing: {
-      name: "Bill Ing",
-      email: "ap@accounting.net",
-      phone: "(111) 222-3333",
-    },
-    admin: {
-      name: "Admin Swazy",
-      email: "admin@gdsn.co",
-      phone: "(301) 867 5309",
-    },
-    gln: "3145210000125",
-    phone: "(123) 456-7890",
-    address: {
-      address: "300 S Riverside Plz",
-      city: "Chicago",
-      state: "IL",
-      zipCode: "60603",
-    },
-    accountManager: {
-      name: "Jeff Williams",
-      email: "jeff@williams.net",
-      phone: "(866) 280-4013",
-    },
-  };
 
   function update(e: CustomEvent) {
     if (isContact) {
@@ -118,6 +102,7 @@
     isUpdate = false;
     isAddressUpdate = false;
     isCancel = false;
+    isDenyCancel = false;
     serviceToCancel = undefined;
   }
 
@@ -125,27 +110,28 @@
     const { name, email, phone } = e.detail;
     const contact: ContactType = { name, email, phone };
     const contactField = e.detail.field as ContactFieldType;
-    accountInfo[contactField as ContactFieldType] = contact;
+    $accountInfo![contactField as ContactFieldType] = contact;
     $toastMessage = createContactUpdateMessage(updateTitle!, contact);
     $isToast = true;
     resetConditionals();
   }
 
-  function createAddress(address: AddressType) {
-    const addressString =
-      address.address +
-      " " +
-      address.city +
-      " " +
-      address.state +
-      "," +
-      " " +
-      address.zipCode;
+  function createAddress(address: AddressType | undefined) {
+    const addressString = address
+      ? address.address +
+        " " +
+        address.city +
+        " " +
+        address.state +
+        "," +
+        " " +
+        address.zipCode
+      : "";
     return addressString;
   }
 
   function updateAddress(e: CustomEvent) {
-    accountInfo.address = e.detail;
+    $accountInfo!.address = e.detail;
     isAddressUpdate = false;
     $isToast = true;
     $toastMessage = createAddressToastMessage(e.detail);
@@ -159,15 +145,30 @@
   }
 
   function handleCancel(e: CustomEvent) {
-    isCancel = true;
     serviceToCancel = $currentSubscriptions.find((sub) => sub.id === e.detail);
+    if (isRenewalCancelable(serviceToCancel!.renewalDate)) {
+      isCancel = true;
+    } else {
+      isDenyCancel = true;
+    }
   }
 
   function confirmCancel() {
     $currentSubscriptions = $currentSubscriptions.filter(
       (sub) => sub.id !== serviceToCancel!.id
     );
+    $isToast = true;
+    $toastMessage = `Successfully cancelled ${serviceToCancel?.label}`;
     resetConditionals();
+  }
+
+  function isRenewalCancelable(date: string, cxlDays: number = 30) {
+    const today = new Date();
+    const renewalDate = new Date(date);
+    const compareDate = new Date(date);
+    compareDate.setDate(renewalDate.getDate() - cxlDays);
+
+    return today < compareDate;
   }
 
   $: if ($isToast) {
@@ -182,44 +183,20 @@
   <Toast message={$toastMessage} on:closeToast={closeToast} />
 {/if}
 
-{#if isUpdate}
-  <UpdateContactDialog
-    {field}
-    {updateTitle}
-    on:updateContact={updateContact}
-    on:closeUpdate={closeUpdate}
-  />
-{/if}
-
-{#if isAddressUpdate}
-  <UpdateAddressDialog
-    on:closeAddressUpdate={resetConditionals}
-    on:updateAddress={updateAddress}
-  />
-{/if}
-
-{#if isContact}
-  <ContactAccountManager
-    name={accountInfo.accountManager.name}
-    email={accountInfo.accountManager.email}
-    phone={accountInfo.accountManager.phone}
-    {field}
-    on:closeContact={resetConditionals}
-  />
-{/if}
-
-{#if isCancel}
-  <CancelDialog
-    service={serviceToCancel}
-    on:confirmCancel={confirmCancel}
-    on:closeCancel={resetConditionals}
-  />
-{/if}
-
 <main class="container m-auto grid justify-start min-h-[80dvh] gap-10 my-6">
-  <Title>{accountInfo.name} Subscription Information</Title>
+  <Title>{$accountInfo?.name} Subscription Information</Title>
   <div class="flex gap-4 w-full">
-    <InfoCard class="h-full w-full">
+    <InfoCard class="h-full w-full relative">
+      {#if isContact}
+        <ContactAccountManager
+          name={$accountInfo?.accountManager.name}
+          email={$accountInfo?.accountManager.email}
+          phone={$accountInfo?.accountManager.phone}
+          {field}
+          on:closeContact={resetConditionals}
+        />
+      {/if}
+
       <Header>Account Info</Header>
       <table>
         <thead>
@@ -230,7 +207,7 @@
         <tbody>
           <tr>
             <td>Company Name:</td>
-            <td>{accountInfo.name}</td>
+            <td>{$accountInfo?.name}</td>
             <td
               ><Button event="contact" value="company name" on:contact={contact}
                 >Contact Account Manager</Button
@@ -239,18 +216,12 @@
           </tr>
           <tr>
             <td>Account ID:</td>
-            <td>{accountInfo.id}</td>
-            <td
-              ><div
-                class="flex bg-accent-2 p-2 rounded-md text-black justify-center"
-              >
-                Cannot Change
-              </div></td
-            >
-          </tr>
+            <td>{$accountInfo?.id}</td>
+            <td> </td></tr
+          >
           <tr>
             <td>GLN:</td>
-            <td>{accountInfo.gln}</td>
+            <td>{$accountInfo?.gln}</td>
             <td
               ><Button event={"contact"} value="GLN" on:contact={contact}
                 >Contact Account Manager</Button
@@ -260,7 +231,24 @@
         </tbody>
       </table>
     </InfoCard>
-    <InfoCard class="h-full self-end w-full">
+
+    <InfoCard class="h-full self-end w-full relative">
+      {#if isUpdate}
+        <UpdateContactDialog
+          {field}
+          {updateTitle}
+          on:updateContact={updateContact}
+          on:closeUpdate={closeUpdate}
+        />
+      {/if}
+
+      {#if isAddressUpdate}
+        <UpdateAddressDialog
+          on:closeAddressUpdate={resetConditionals}
+          on:updateAddress={updateAddress}
+        />
+      {/if}
+
       <Header>Account Contacts</Header>
       <table>
         <thead>
@@ -273,14 +261,14 @@
           <tr>
             <td>Billing Contact:</td>
             <td>
-              <div>
-                {accountInfo.billing.name}
+              <div class="border-b-2 border-dashed border-primary">
+                {$accountInfo?.billing.name}
               </div>
-              <div>
-                {accountInfo.billing.email}
+              <div class="border-b-2 border-dashed border-primary">
+                {$accountInfo?.billing.email}
               </div>
-              <div>
-                {accountInfo.billing.phone}
+              <div class="border-b-2 border-dashed border-primary">
+                {$accountInfo?.billing.phone}
               </div>
             </td>
             <td
@@ -292,9 +280,9 @@
           <tr>
             <td>Admin:</td>
             <td>
-              <div>{accountInfo.admin.name}</div>
-              <div>{accountInfo.admin.email}</div>
-              <div>{accountInfo.admin.phone}</div>
+              <div class="border-b-2 border-dashed border-primary">{$accountInfo?.admin.name}</div>
+              <div class="border-b-2 border-dashed border-primary">{$accountInfo?.admin.email}</div>
+              <div class="border-b-2 border-dashed border-primary">{$accountInfo?.admin.phone}</div>
             </td>
             <td
               ><Button value="admin" event="update" on:update={update}
@@ -304,7 +292,7 @@
           </tr>
           <tr>
             <td>Address:</td>
-            <td>{createAddress(accountInfo.address)}</td>
+            <td>{createAddress($accountInfo?.address)}</td>
             <td
               ><Button value="address" event="update" on:update={handleAddress}
                 >Update Address</Button
@@ -316,7 +304,23 @@
     </InfoCard>
   </div>
 
-  <InfoCard class="w-full">
+  <InfoCard class="w-full relative">
+    {#if isDenyCancel}
+      <DenyCancelDialog
+        service={serviceToCancel}
+        accountInfo={$accountInfo}
+        on:closeDenyCancel={closeUpdate}
+      />
+    {/if}
+
+    {#if isCancel}
+      <CancelDialog
+        service={serviceToCancel}
+        on:confirmCancel={confirmCancel}
+        on:closeCancel={resetConditionals}
+      />
+    {/if}
+
     <Header>Upcoming Subscription Renewals</Header>
 
     <table class="w-full">
@@ -340,15 +344,23 @@
               </td>
               <td>
                 {#if sub.inv}
-                  {sub.inv}
+                  <a href="/invoice/{sub.inv}" class="underline hover:text-secondary" target="_blank"
+                    >{sub.inv}</a
+                  >
                 {:else}
                   Invoice Currently Unavailable
                 {/if}
               </td>
-              <td>{sub.so}</td>
+              <td
+                ><a
+                  href="/sales-order/{sub.so}"
+                  class="underline hover:text-secondary"
+                  target="_blank">{sub.so}</a
+                ></td
+              >
               <td>
                 <a
-                  class=" text-black underline"
+                  class=" text-black underline hover:text-secondary"
                   href="/product-descriptions#{sub.id}">What Is {sub.label}?</a
                 >
               </td>

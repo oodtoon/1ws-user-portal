@@ -5,6 +5,7 @@ export type SubscriptionInfoType = {
   inv: string | null;
   so: string | null;
   id: string;
+  cxlDays: number;
 };
 
 export type ProductType = {
@@ -12,6 +13,9 @@ export type ProductType = {
   description: string;
   subscriptionType: string;
   subsidiaries?: string[];
+  why?: string;
+  companyName?: string;
+  login?: LoginType;
   id: string;
 };
 
@@ -28,16 +32,21 @@ export type ContactType = {
   phone: string;
 };
 
-export type ContactFieldType = "admin" | "billing"
+export type ContactFieldType = "admin" | "billing";
+
+export type LoginType = {
+  link: string;
+  label: string;
+}
 
 export type AccountInfoType = {
-  name: string,
-  id: string,
-  gln: string,
-  phone: string,
-  billing: ContactType,
-  admin: ContactType,
-  address: AddressType,
-  accountManager: ContactType
+  name: string;
+  id: string;
+  gln: string;
+  phone: string;
+  billing: ContactType;
+  admin: ContactType;
+  address: AddressType;
+  accountManager: ContactType;
   // subscriptions: {}
-}
+};
