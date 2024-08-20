@@ -4,7 +4,7 @@
 
   let contacts = [
     {
-      department: "Sales",
+      department: "Account Manager",
       name: "Jeff Williams",
       email: "jeff@1worldsync.net",
       phone: "(866) 280-4013",

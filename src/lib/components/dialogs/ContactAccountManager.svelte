@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Dialog from "./ui/Dialog.svelte";
-  import Button from "./ui/Button.svelte";
-  import Header from "./ui/Header.svelte";
+  import Dialog from "../ui/Dialog.svelte";
+  import Button from "../ui/Button.svelte";
+  import Header from "../ui/Header.svelte";
   import { createEventDispatcher } from "svelte";
 
   export let name;
