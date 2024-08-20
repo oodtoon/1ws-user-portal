@@ -18,6 +18,7 @@
     SubscriptionInfoType,
   } from "$lib/types";
   import { setContext } from "svelte";
+  import EditIcon from "$lib/components/icons/EditIcon.svelte";
 
   setContext("subs", $currentSubscriptions);
 
@@ -202,7 +203,7 @@
         <thead>
           <TableHead>Field</TableHead>
           <TableHead>Current Info</TableHead>
-          <TableHead>Edit</TableHead>
+          <TableHead class="flex items-center">Edit <EditIcon /></TableHead>
         </thead>
         <tbody>
           <tr>
@@ -254,7 +255,7 @@
         <thead>
           <TableHead>Field</TableHead>
           <TableHead>Current Info</TableHead>
-          <TableHead>Edit</TableHead>
+          <TableHead class="flex items-center">Edit <EditIcon /></TableHead>
         </thead>
 
         <tbody>
@@ -280,9 +281,15 @@
           <tr>
             <td>Admin:</td>
             <td>
-              <div class="border-b-2 border-dashed border-primary">{$accountInfo?.admin.name}</div>
-              <div class="border-b-2 border-dashed border-primary">{$accountInfo?.admin.email}</div>
-              <div class="border-b-2 border-dashed border-primary">{$accountInfo?.admin.phone}</div>
+              <div class="border-b-2 border-dashed border-primary">
+                {$accountInfo?.admin.name}
+              </div>
+              <div class="border-b-2 border-dashed border-primary">
+                {$accountInfo?.admin.email}
+              </div>
+              <div class="border-b-2 border-dashed border-primary">
+                {$accountInfo?.admin.phone}
+              </div>
             </td>
             <td
               ><Button value="admin" event="update" on:update={update}
@@ -344,8 +351,10 @@
               </td>
               <td>
                 {#if sub.inv}
-                  <a href="/invoice/{sub.inv}" class="underline hover:text-secondary" target="_blank"
-                    >{sub.inv}</a
+                  <a
+                    href="/invoice/{sub.inv}"
+                    class="underline hover:text-secondary"
+                    target="_blank">{sub.inv}</a
                   >
                 {:else}
                   Invoice Currently Unavailable
