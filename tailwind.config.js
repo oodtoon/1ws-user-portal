@@ -18,6 +18,9 @@ export default {
       colors: {
         ...colors,
       },
+      fontFamily: {
+        body: ['Archivo']
+      }
     },
   },
   plugins: [],
