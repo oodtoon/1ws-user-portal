@@ -23,7 +23,7 @@
   }
 </script>
 
-<Dialog class="">
+<Dialog class="border-primary">
   <Header>Enter in new address:</Header>
   <form class="grid gap-2 grid-cols-3">
     <label for="address" class=""> Street Address: </label>

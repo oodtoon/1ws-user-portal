@@ -4,6 +4,7 @@
   import type { SubscriptionInfoType, AccountInfoType } from "$lib/types";
   import { createEventDispatcher } from "svelte";
   import Header from "../ui/Header.svelte";
+  import DenyIcon from "../icons/DenyIcon.svelte";
 
   export let service: SubscriptionInfoType | undefined;
   export let accountInfo: AccountInfoType | null;
@@ -15,8 +16,8 @@
   }
 </script>
 
-<Dialog>
-  <Header class="bg-tertiary p-2 rounded text-center">Cancellation Period Missed</Header>
+<Dialog class="border-primary">
+  <Header class="bg-tertiary p-2 rounded text-center flex items-center"><DenyIcon/> Cancellation Period Missed</Header>
   <p>
     Unable to Cancel <strong>
       {service?.label}

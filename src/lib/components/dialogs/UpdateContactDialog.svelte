@@ -26,7 +26,7 @@
   }
 </script>
 
-<Dialog class="items-center justify-items-center">
+<Dialog class="border-primary items-center justify-items-center">
   <Header>Update {updateTitle}</Header>
   <form class="grid grid-cols-3 gap-2 justify-items-center">
     <label for="name"> Name: </label>

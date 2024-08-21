@@ -5,7 +5,7 @@
   import Button from "$lib/components/ui/Button.svelte";
   import InfoCard from "$lib/components/InfoCard.svelte";
   import { currentSubscriptions, accountInfo } from "$lib/store";
-  import ContactAccountManager from "$lib/components/dialogs/ContactAccountManager.svelte";
+  import ContactAccountManager from "$lib/components/dialogs/ContactAccountManager.svelte"
   import UpdateContactDialog from "$lib/components/dialogs/UpdateContactDialog.svelte";
   import UpdateAddressDialog from "$lib/components/dialogs/UpdateAddressDialog.svelte";
   import CancelDialog from "$lib/components/dialogs/CancelDialog.svelte";
@@ -33,14 +33,6 @@
   let isCancel = false;
   let isDenyCancel = false;
   let serviceToCancel: SubscriptionInfoType | undefined;
-
-  const today = new Date();
-  const futureDate = new Date("9/1/2024");
-  const compareDate = new Date("9/1/2024");
-
-  console.log(compareDate.setDate(futureDate.getDate() - 30));
-  console.log(today < compareDate);
-  console.log(compareDate);
 
   let toastInt;
 
@@ -184,9 +176,9 @@
   <Toast message={$toastMessage} on:closeToast={closeToast} />
 {/if}
 
-<main class="container m-auto grid justify-start min-h-[80dvh] gap-10 my-6">
+<main class="container m-auto grid min-h-[80dvh] gap-10 my-6">
   <Title>{$accountInfo?.name} Subscription Information</Title>
-  <div class="flex gap-4 w-full">
+  <section class="flex gap-4 w-full">
     <InfoCard class="h-full w-full relative">
       {#if isContact}
         <ContactAccountManager
@@ -199,7 +191,7 @@
       {/if}
 
       <Header>Account Info</Header>
-      <table>
+      <table class="w-full">
         <thead>
           <TableHead>Field</TableHead>
           <TableHead>Current Info</TableHead>
@@ -251,7 +243,7 @@
       {/if}
 
       <Header>Account Contacts</Header>
-      <table>
+      <table class="w-full">
         <thead>
           <TableHead>Field</TableHead>
           <TableHead>Current Info</TableHead>
@@ -309,7 +301,7 @@
         </tbody>
       </table>
     </InfoCard>
-  </div>
+  </section>
 
   <InfoCard class="w-full relative">
     {#if isDenyCancel}
