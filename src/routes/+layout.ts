@@ -19,7 +19,7 @@ export function load() {
       label: "Content Cast",
       rate: "$2,950",
       renewalDate: "10/1/2024",
-      inv: null,
+      inv: "INV765439",
       so: "SO23414",
       id: "contentCast",
       cxlDays: 30,
