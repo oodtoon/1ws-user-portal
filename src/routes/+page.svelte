@@ -5,11 +5,12 @@
   import Button from "$lib/components/ui/Button.svelte";
   import InfoCard from "$lib/components/InfoCard.svelte";
   import { currentSubscriptions, accountInfo } from "$lib/store";
-  import ContactAccountManager from "$lib/components/dialogs/ContactAccountManager.svelte"
+  import ContactAccountManager from "$lib/components/dialogs/ContactAccountManager.svelte";
   import UpdateContactDialog from "$lib/components/dialogs/UpdateContactDialog.svelte";
   import UpdateAddressDialog from "$lib/components/dialogs/UpdateAddressDialog.svelte";
   import CancelDialog from "$lib/components/dialogs/CancelDialog.svelte";
   import DenyCancelDialog from "$lib/components/dialogs/DenyCancelDialog.svelte";
+  import PastDueDialog from "$lib/components/dialogs/PastDueDialog.svelte";
   import Toast from "$lib/components/Toast.svelte";
   import type {
     AddressType,
@@ -33,6 +34,8 @@
   let isCancel = false;
   let isDenyCancel = false;
   let serviceToCancel: SubscriptionInfoType | undefined;
+  let isPastDue = false;
+  let pastDueSub: SubscriptionInfoType | undefined;
 
   let toastInt;
 
@@ -97,6 +100,8 @@
     isCancel = false;
     isDenyCancel = false;
     serviceToCancel = undefined;
+    isPastDue = false;
+    pastDueSub = undefined;
   }
 
   function updateContact(e: CustomEvent) {
@@ -162,6 +167,18 @@
     compareDate.setDate(renewalDate.getDate() - cxlDays);
 
     return today < compareDate;
+  }
+
+  function isRenewalPastDue(date: string) {
+    const today = new Date();
+    const renewalDate = new Date(date);
+
+    return today > renewalDate;
+  }
+
+  function handlePastDue(sub: SubscriptionInfoType) {
+    pastDueSub = sub;
+    isPastDue = true;
   }
 
   $: if ($isToast) {
@@ -320,6 +337,10 @@
       />
     {/if}
 
+    {#if isPastDue}
+      <PastDueDialog {pastDueSub} on:closePastDue={resetConditionals} />
+    {/if}
+
     <Header>Upcoming Subscription Renewals</Header>
 
     <table class="w-full">
@@ -366,9 +387,26 @@
                 >
               </td>
               <td>
-                <Button event={"cancel"} value={sub.id} on:cancel={handleCancel}
-                  >Cancel</Button
-                >
+                {#if isRenewalPastDue(sub.renewalDate)}
+                  <button
+                    class="bg-red-700 rounded-md py-2 px-1 text-white font-bold hover:bg-red-500"
+                    on:click={() => handlePastDue(sub)}>PAST DUE</button
+                  >
+                {:else if isRenewalCancelable(sub.renewalDate, sub.cxlDays)}
+                  <Button
+                    event={"cancel"}
+                    value={sub.id}
+                    on:cancel={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                {:else}
+                  <Button
+                    event="cantCancel"
+                    value={sub.id}
+                    on:cantCancel={handleCancel}>Unavailable</Button
+                  >
+                {/if}
               </td>
             </tr>
           {/each}

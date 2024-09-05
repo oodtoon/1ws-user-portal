@@ -16,6 +16,15 @@ export function load() {
       cxlDays: 30,
     },
     {
+      label: "Content Cast",
+      rate: "$2,950",
+      renewalDate: "10/1/2024",
+      inv: null,
+      so: "SO23414",
+      id: "contentCast",
+      cxlDays: 30,
+    },
+    {
       label: "Kroger PI",
       rate: "$1,055",
       renewalDate: "2/1/2025",
