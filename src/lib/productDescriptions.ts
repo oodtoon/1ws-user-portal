@@ -71,6 +71,11 @@ export const productDescriptions = {
     description:
       "Item Management enables your company to share accurate GDSN item data with the retail partners that accept/require it. You can publish and unlimited amount of item data to an unlimited number of recipients in our network.",
   },
+  contentCast: {
+    id: "cc",
+    label: "Content Cast",
+    description: "Content Cast enables you to increase your brand awareness and story on your product pages. This service also enables you to have consistent marketing information across your product pages."
+  }
 };
 
 export const complimentaryProducts = [

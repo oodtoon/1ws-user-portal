@@ -48,7 +48,9 @@
 
       {#if product.login}
         <Header>Login to {product.label} Here:</Header>
-        <a href={product.login.link} target="_blank" class="underline">{product.login.label} Login</a>
+        <a href={product.login.link} target="_blank" class="underline"
+          >{product.login.label} Login</a
+        >
       {/if}
     </section>
   {/each}
@@ -61,7 +63,9 @@
       <Header>{freeProduct.label}</Header>
       <p>{freeProduct.description}</p>
       <Header>Login Here:</Header>
-      <a href={freeProduct.link} target="_blank" class="underline">{freeProduct.label} Login</a>
+      <a href={freeProduct.link} target="_blank" class="underline"
+        >{freeProduct.label} Login</a
+      >
     </section>
   {/each}
 </main>
